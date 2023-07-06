@@ -25,18 +25,12 @@ void Process::CpuUtilization(std::vector<std::string> stats_string) {
 
   // Calculate cpu usage per
   // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
-  for (long unsigned int i = 0; i < stats_string.size(); i++) {
-    std::istringstream linestream(stats_string[i]);
-    if ( i == 13 )
-      linestream >> stats.utime;
-    if ( i == 14 )
-      linestream >> stats.stime;
-    if ( i == 15 )
-      linestream >> stats.cutime;
-    if ( i == 16 )
-      linestream >> stats.cstime;
-    if ( i == 21 )
-      linestream >> stats.starttime;
+  if (stats_string.size() >= 22) {
+    stats.utime = std::stoul(stats_string[13]);
+    stats.stime = std::stoul(stats_string[14]);
+    stats.cutime = std::stoul(stats_string[15]);
+    stats.cstime = std::stoul(stats_string[16]);
+    stats.starttime = std::stoul(stats_string[21]);
   }
   total_time = stats.utime + stats.stime;
   // Only include if child processes should be counted too:
@@ -107,9 +101,9 @@ void Process::Command(string commands) {
 void Process::UpTime(vector<string> stats) {
   int uptime_index = 13;  // Uptime index
   long uptime = 0;
+
   if (stats.size() >= 14) {
-    std::istringstream linestream(stats[uptime_index]);
-    linestream >> uptime;  // Uptime in ticks
+    uptime = std::stoul(stats[uptime_index]);
   }
 
   uptime_ = uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
