@@ -14,7 +14,7 @@ using std::to_string;
 // 50 bars uniformly displayed from 0 - 100 %
 // 2% is one bar(|)
 std::string NCursesDisplay::ProgressBar(float percent) {
-  std::string result{"0%"};
+  std::string result{"0"};  // TODO why does % here cause core dump
   int size{50};
   float bars{percent * size};
 
@@ -57,10 +57,10 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   int row{0};
   int const pid_column{2};
   int const user_column{9};
-  int const cpu_column{16};
-  int const ram_column{26};
-  int const time_column{35};
-  int const command_column{46};
+  int const cpu_column{19};
+  int const ram_column{29};
+  int const time_column{38};
+  int const command_column{49};
   wattron(window, COLOR_PAIR(2));
   mvwprintw(window, ++row, pid_column, "PID");
   mvwprintw(window, row, user_column, "USER");
@@ -70,10 +70,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   mvwprintw(window, row, command_column, "COMMAND");
   wattroff(window, COLOR_PAIR(2));
   for (int i = 0; i < n; ++i) {
-    //You need to take care of the fact that the cpu utilization has already been multiplied by 100.
-    // Clear the line
     mvwprintw(window, ++row, pid_column, (string(window->_maxx-2, ' ').c_str()));
-    
     mvwprintw(window, row, pid_column, to_string(processes[i].Pid()).c_str());
     mvwprintw(window, row, user_column, processes[i].User().c_str());
     float cpu = processes[i].CpuUtilization();

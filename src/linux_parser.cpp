@@ -93,7 +93,7 @@ float LinuxParser::MemoryUtilization() {
 
 // Read and return the system uptime
 long LinuxParser::UpTime() {
-  string line;
+  string line = "";
   double uptime = 0;
   double uptime_incl_suspend = 0;
   std::ifstream filestream(kProcDirectory + kUptimeFilename);
@@ -110,7 +110,7 @@ long LinuxParser::Jiffies() { return 0; }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid) { return 0; }
+// long LinuxParser::ActiveJiffies(int pid) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -182,14 +182,15 @@ int LinuxParser::RunningProcesses() {
 }
 
 // Read and return the command associated with a process
-string LinuxParser::Command(int pid) {
-  string line;
-  string cmd = "";
+string LinuxParser::ReadCommand(int pid) {
+  string line = {};
+  string cmd = {};
 
   // Get UID
   std::ifstream filestream(kProcDirectory + to_string(pid) + kCmdlineFilename);
   if (filestream.is_open()) {
     std::getline(filestream, line);
+    std::replace(line.begin(), line.end(), '\000', ' ');
     std::istringstream linestream(line);
     linestream >> cmd;
   }
@@ -197,61 +198,36 @@ string LinuxParser::Command(int pid) {
   return cmd;
 }
 
-// Read and return the memory used by a process
-string LinuxParser::Ram(int pid) {
-  string line;
-  string key = "";
-  int ram = 0;
-  int mb_per_kb = 1024;
+// Read status file and return strings of interest
+vector<string> LinuxParser::ReadStatus(int pid) {
+  string line = {};
+  string key = {};
+  vector<string> statuses = {};
 
-  // Get UID
+  // Read status and build vector of lines of interest
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatusFilename);
   if (filestream.is_open()) {
-    while (std::getline(filestream, line) && key != "VmSize") {
+    while (std::getline(filestream, line) && statuses.size() < 2) {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
-      while (linestream >> key >> ram) {
-        if (key == "VmSize")
-          break;
+      while (linestream >> key) {
+        if ( key == "VmSize" || key == "Uid" )  // We only need to process these lines
+          statuses.push_back(line);
       }
     }
   }
 
-  return to_string( ram / mb_per_kb );
-}
-
-// Read and return the user ID associated with a process
-string LinuxParser::Uid(int pid) {
-  string line;
-  string key = "";
-  string uid = "";
-
-  // Get UID
-  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatusFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line) && key != "Uid") {
-      std::replace(line.begin(), line.end(), ':', ' ');
-      std::istringstream linestream(line);
-      while (linestream >> key >> uid) {
-        if (key == "Uid")
-          break;
-      }
-    }
-  }
-
-  return uid;
+  return statuses;
 }
 
 // Read and return the user associated with a process
-string LinuxParser::User(int pid) {
+string LinuxParser::ReadUser(string uid) {
   string line;
-  string uid = "";
   string username = "";
   string pass_col1 = "";
   string pass_uid = "";
 
   // Get Username
-  uid = Uid(pid);
   std::ifstream filestream(kPasswordPath);
   if (filestream.is_open()) {
     while (std::getline(filestream, line) && pass_uid != uid) {
@@ -259,7 +235,7 @@ string LinuxParser::User(int pid) {
       std::istringstream linestream(line);
       while (linestream >> username >> pass_col1 >> pass_uid) {
         if (pass_uid == uid)
-          break;
+          return username;
       }
     }
   }
@@ -267,41 +243,21 @@ string LinuxParser::User(int pid) {
   return username;
 }
 
-// Read and return the uptime of a process
-long LinuxParser::UpTime(int pid) {
-  string line;
-  string key;
+// Read stat file and return string
+vector<string> LinuxParser::ReadStat(int pid) {
+  string line = "";
   string value = "";
-  long uptime = 0;
-  int index = 22;  // 22nd item is updtime in ticks
-  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
-    std::istringstream linestream(line);
-    for ( int i = 0; i < index - 1; i++ ) {
-      linestream >> value;
-      }
-    linestream >> uptime;  // Uptime in ticks.
-  }
-
-  return uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds.
-}
-
-// Read and return CPU utilization of a process
-vector<string> LinuxParser::CpuUtilization(int pid) {
-  std::string line;
-  std::string key;
-  std::string stat{};
-  std::vector<string> stat_values{};
+  vector<string> stats = {};
 
   // Access file, read, and store stat data
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
-    std::getline(filestream, line);
-    std::istringstream linestream(line);
-    while (linestream >> stat) {
-        stat_values.push_back(stat);
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> value) {
+        stats.push_back(value);
+        }
       }
+    }
+  return stats;
   }
-  return stat_values;
-}
