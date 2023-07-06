@@ -61,8 +61,8 @@ string Process::Ram() { return to_string(static_cast<int>(ram_)); }
 
 // Set user id and username
 void Process::User(vector<string> statuses) {
-  string uid = {};
-  string key = {};
+  string uid = "";
+  string key = "";
 
   // Find Uid and set class data
   for ( auto status : statuses ) {
@@ -79,10 +79,9 @@ void Process::User(vector<string> statuses) {
 
 // Set Ram
 void Process::Ram(vector<string> statuses) {
-  int ram = {};
-  string key = {};
+  int ram = 0;
+  string key = "";
   float kb_per_mb = 1024.0;
-
 
   for ( auto status : statuses ) {
     std::istringstream linestream(status);
@@ -95,7 +94,7 @@ void Process::Ram(vector<string> statuses) {
 
 // Set command
 void Process::Command(string commands) {
-  string command = {};
+  string command = "";
 
   // Extract first entry and set to class data
   std::istringstream linestream(commands);
@@ -106,9 +105,12 @@ void Process::Command(string commands) {
 // Set Uptime
 void Process::UpTime(vector<string> stats) {
   int uptime_index = 13;  // Uptime in ticks.
-  std::istringstream linestream(stats[uptime_index]);
-  long uptime;
-  linestream >> uptime;
+  long uptime = 0;
+  if (stats.size() >= 14) {
+    std::istringstream linestream(stats[uptime_index]);
+    linestream >> uptime;
+  }
+
   uptime_ = uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds.
 }
 
