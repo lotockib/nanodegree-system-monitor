@@ -39,7 +39,8 @@ void Process::CpuUtilization(std::vector<std::string> stats_string) {
       linestream >> stats.starttime;
   }
   total_time = stats.utime + stats.stime;
-  // total_time = total_time + stats.cutime + stats.cstime;  // Include if child processes should be counted too
+  // Only include if child processes should be counted too:
+  // total_time = total_time + stats.cutime + stats.cstime;
   seconds = stats.utime - (stats.starttime / hertz);
   cpu_ = 100 * ((total_time / hertz) / seconds);
 }
@@ -104,14 +105,14 @@ void Process::Command(string commands) {
 
 // Set Uptime
 void Process::UpTime(vector<string> stats) {
-  int uptime_index = 13;  // Uptime in ticks.
+  int uptime_index = 13;  // Uptime index
   long uptime = 0;
   if (stats.size() >= 14) {
     std::istringstream linestream(stats[uptime_index]);
-    linestream >> uptime;
+    linestream >> uptime;  // Uptime in ticks
   }
 
-  uptime_ = uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds.
+  uptime_ = uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
 }
 
 // Overload the "less than" comparison operator for Process objects
