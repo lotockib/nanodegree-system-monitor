@@ -118,11 +118,7 @@ long LinuxParser::Jiffies(vector<string> stats) {
     std::stoul(stats[CPUStates::kSteal_]);
   }
 
-// TODO: Read and return the number of active jiffies for a PID
-// REMOVE: [[maybe_unused]] once you define the function
-// long LinuxParser::ActiveJiffies(int pid) { return 0; }
-
-// TODO: Read and return the number of active jiffies for the system
+// Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies(vector<string> stats) {
   return
     std::stoul(stats[CPUStates::kUser_]) +

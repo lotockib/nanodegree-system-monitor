@@ -44,6 +44,16 @@ enum CPUStates {
   kGuest_ = 8,
   kGuestNice_ = 9
 };
+
+// Process
+enum ProcessStats {
+  kUtime = 13,
+  kStime = 14,
+  kCutime = 15,
+  kCstime = 16,
+  kStarttime = 21
+};
+
 std::vector<std::string> ReadStat();
 long Jiffies(vector<string> stats);
 long ActiveJiffies(vector<string> stats);

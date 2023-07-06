@@ -26,11 +26,11 @@ void Process::CpuUtilization(std::vector<std::string> stats_string) {
   // Calculate cpu usage per
   // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
   if (stats_string.size() >= 22) {
-    stats.utime = std::stoul(stats_string[13]);
-    stats.stime = std::stoul(stats_string[14]);
-    stats.cutime = std::stoul(stats_string[15]);
-    stats.cstime = std::stoul(stats_string[16]);
-    stats.starttime = std::stoul(stats_string[21]);
+    stats.utime = std::stoul(stats_string[LinuxParser::ProcessStats::kCutime]);
+    stats.stime = std::stoul(stats_string[LinuxParser::ProcessStats::kStime]);
+    stats.cutime = std::stoul(stats_string[LinuxParser::ProcessStats::kCutime]);
+    stats.cstime = std::stoul(stats_string[LinuxParser::ProcessStats::kCstime]);
+    stats.starttime = std::stoul(stats_string[LinuxParser::ProcessStats::kStarttime]);
   }
   total_time = stats.utime + stats.stime;
   // Only include if child processes should be counted too:

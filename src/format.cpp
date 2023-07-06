@@ -1,4 +1,5 @@
 #include <string>
+#include <cmath>
 
 #include "../include/format.h"
 
@@ -24,4 +25,19 @@ string Format::ElapsedTime(long seconds) {
   sec = format_to_string(((seconds % 3600) % 60) % 60);
 
   return hrs + min + sec;
+}
+
+// Format to string with 3 character width
+string Format::MinimumWidth(int value) {
+  string result = "";
+
+  if (value < 10) {
+    return " " + std::to_string(value);
+  }
+
+  if (value < 100) {
+    return "  " + std::to_string(value);
+  }
+
+  return std::to_string(value);
 }
