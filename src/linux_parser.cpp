@@ -105,43 +105,64 @@ long LinuxParser::UpTime() {
   return static_cast<long int>(uptime);
   }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+// Read and return the number of jiffies for the system
+long LinuxParser::Jiffies(vector<string> stats) {
+  return
+    std::stoul(stats[CPUStates::kIdle_]) +
+    std::stoul(stats[CPUStates::kIOwait_]) +
+    std::stoul(stats[CPUStates::kUser_]) +
+    std::stoul(stats[CPUStates::kNice_]) +
+    std::stoul(stats[CPUStates::kSystem_]) +
+    std::stoul(stats[CPUStates::kIRQ_]) +
+    std::stoul(stats[CPUStates::kSoftIRQ_]) +
+    std::stoul(stats[CPUStates::kSteal_]);
+  }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 // long LinuxParser::ActiveJiffies(int pid) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies(vector<string> stats) {
+  return
+    std::stoul(stats[CPUStates::kUser_]) +
+    std::stoul(stats[CPUStates::kNice_]) +
+    std::stoul(stats[CPUStates::kSystem_]) +
+    std::stoul(stats[CPUStates::kIRQ_]) +
+    std::stoul(stats[CPUStates::kSoftIRQ_]) +
+    std::stoul(stats[CPUStates::kSteal_]);
+  }
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+// Read and return the number of idle jiffies for the system
+long LinuxParser::IdleJiffies(vector<string> stats) {
+  return
+    std::stoul(stats[CPUStates::kIdle_]) +
+    std::stoul(stats[CPUStates::kIOwait_]);
+  }
 
-// Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() {
-  std::string line;
-  std::string key;
-  std::string cpu_value{};
-  std::vector<string> cpu_values{};
+
+// Read stat file and return string
+vector<string> LinuxParser::ReadStat() {
+  string line = "";
+  string value = "";
+  string key = "cpu";
+  vector<string> stats = {};
 
   // Access file, read, and store stat data
-  std::ifstream filestream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
+  std::ifstream filestream(kProcDirectory + kStatFilename);
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
-      while (linestream >> key) {
-        if (key == "cpu") {
-          while (linestream >> cpu_value) {
-            cpu_values.push_back(cpu_value);
-          }
-          return cpu_values;
-        }
+      linestream >> key;
+      if (key == "cpu") {
+        while (linestream >> value)
+          stats.push_back(value);
+        return stats;
       }
     }
   }
-  return cpu_values;
-}
+  return stats;
+  }
 
 // Read and return the total number of processes
 int LinuxParser::TotalProcesses() {

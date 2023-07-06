@@ -1,17 +1,10 @@
 #ifndef PROCESSOR_H_
 #define PROCESSOR_H_
 
-struct Status {
-  unsigned long long int user = 0;
-  unsigned long long int nice = 0;
-  unsigned long long int system = 0;
-  unsigned long long int idle = 0;
-  unsigned long long int iowait = 0;
-  unsigned long long int irq = 0;
-  unsigned long long int softirq = 0;
-  unsigned long long int steal = 0;
-  unsigned long long int guest = 0;
-  unsigned long long int guestnice = 0;
+struct Jiffies {
+  long idle = 0;
+  long active = 0;
+  long total = 0;
 };
 
 class Processor {
@@ -22,8 +15,8 @@ class Processor {
   float Utilization();
 
  private:
-  Status current_;
-  Status previous_;
+  Jiffies current_;
+  Jiffies previous_;
   void ReadStatus();
 };
 
