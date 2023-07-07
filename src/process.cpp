@@ -63,7 +63,7 @@ void Process::User(vector<string> statuses) {
   for ( auto status : statuses ) {
     std::istringstream linestream(status);
     while (linestream >> key >> uid) {
-      if (key == "Uid")
+      if (key == LinuxParser::kFilterUID)
         uid_ = uid;
     }
   }
@@ -81,10 +81,7 @@ void Process::Ram(vector<string> statuses) {
   for ( auto status : statuses ) {
     std::istringstream linestream(status);
     while (linestream >> key >> ram) {
-      // Using VmRSS instead of VmSize because I want physical memory usage
-      // VmSize can give more than physical RAM size which is misleading
-      // See https://man7.org/linux/man-pages/man5/proc.5.html
-      if (key == "VmRSS")
+      if (key == LinuxParser::kFilterProcMem)
         ram_ = ram / kb_per_mb;
     }
   }

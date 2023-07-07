@@ -11,16 +11,30 @@ using std::vector;
 
 namespace LinuxParser {
 // Paths
-const std::string kProcDirectory{"/proc/"};
-const std::string kCmdlineFilename{"/cmdline"};
-const std::string kCpuinfoFilename{"/cpuinfo"};
-const std::string kStatusFilename{"/status"};
-const std::string kStatFilename{"/stat"};
-const std::string kUptimeFilename{"/uptime"};
-const std::string kMeminfoFilename{"/meminfo"};
-const std::string kVersionFilename{"/version"};
-const std::string kOSPath{"/etc/os-release"};
-const std::string kPasswordPath{"/etc/passwd"};
+const string kProcDirectory{"/proc/"};
+const string kCmdlineFilename{"/cmdline"};
+const string kCpuinfoFilename{"/cpuinfo"};
+const string kStatusFilename{"/status"};
+const string kStatFilename{"/stat"};
+const string kUptimeFilename{"/uptime"};
+const string kMeminfoFilename{"/meminfo"};
+const string kVersionFilename{"/version"};
+const string kOSPath{"/etc/os-release"};
+const string kPasswordPath{"/etc/passwd"};
+
+// Constants
+const string kFilterProcesses("processes");
+const string kFilterRunningProcesses("procs_running");
+const string kFilterMemTotal("MemTotal");
+const string kFilterMemFree("MemFree");
+const string kFilterCpu("cpu");
+const string kFilterUID("Uid");
+      // Using VmRSS instead of VmSize because I want physical memory usage
+      // VmSize can give more than physical RAM size which is misleading
+      // See https://man7.org/linux/man-pages/man5/proc.5.html
+const string kFilterProcMem("VmRSS");
+const string kFilterkB("kB");
+const string kFilterPrettyName("PRETTY_NAME");
 
 // System
 float MemoryUtilization();

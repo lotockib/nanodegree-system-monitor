@@ -24,7 +24,7 @@ string LinuxParser::OperatingSystem() {
       std::replace(line.begin(), line.end(), '"', ' ');
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
+        if (key == kFilterPrettyName) {
           std::replace(value.begin(), value.end(), '_', ' ');
           return value;
         }
@@ -81,9 +81,9 @@ float LinuxParser::MemoryUtilization() {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       while (linestream >> key >> value >> value_units) {
-        if (key == "MemTotal" && value_units == "kB")
+        if (key == kFilterMemTotal && value_units == kFilterkB)
           mem_total = value;
-        else if (key == "MemFree" && value_units == "kB")
+        else if (key == kFilterMemFree && value_units == kFilterkB)
           mem_free = value;
       }
     }
@@ -181,7 +181,7 @@ int LinuxParser::TotalProcesses() {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
-        if (key == "processes") {
+        if (key == kFilterProcesses) {
           return value;
         }
       }
@@ -200,7 +200,7 @@ int LinuxParser::RunningProcesses() {
     while (std::getline(filestream, line)) {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
-        if (key == "procs_running") {
+        if (key == kFilterRunningProcesses) {
           return value;
         }
       }
@@ -239,7 +239,7 @@ vector<string> LinuxParser::ReadStatus(int pid) {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       while (linestream >> key) {
-        if ( key == "VmRSS" || key == "Uid" )  // We only need to process these lines
+        if ( key == kFilterProcMem || key == kFilterUID )  // We only need to process these lines
           statuses.push_back(line);
       }
     }
