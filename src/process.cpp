@@ -16,17 +16,17 @@ using std::vector;
 int Process::Pid() { return pid_; }
 
 // Set Cpu utilization
-void Process::CpuUtilization(std::vector<std::string> stats_string) {
+void Process::CpuUtilization(std::vector<std::string> stats_string, long system_uptime) {
   unsigned long long int total_time = 0;
   float seconds = 0;
   float hertz = sysconf(_SC_CLK_TCK);
   string stats_string_concat = "";
-  PidStat stats = {};
+  PidStat stats;
 
   // Calculate cpu usage per
   // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat/16736599#16736599
   if (stats_string.size() >= 22) {
-    stats.utime = std::stoul(stats_string[LinuxParser::ProcessStats::kCutime]);
+    stats.utime = std::stoul(stats_string[LinuxParser::ProcessStats::kUtime]);
     stats.stime = std::stoul(stats_string[LinuxParser::ProcessStats::kStime]);
     stats.cutime = std::stoul(stats_string[LinuxParser::ProcessStats::kCutime]);
     stats.cstime = std::stoul(stats_string[LinuxParser::ProcessStats::kCstime]);
@@ -35,8 +35,8 @@ void Process::CpuUtilization(std::vector<std::string> stats_string) {
   total_time = stats.utime + stats.stime;
   // Only include if child processes should be counted too:
   // total_time = total_time + stats.cutime + stats.cstime;
-  seconds = stats.utime - (stats.starttime / hertz);
-  cpu_ = 100 * ((total_time / hertz) / seconds);
+  seconds = system_uptime - (stats.starttime / hertz);
+  cpu_ = (total_time / hertz) / seconds;
 }
 
 // Return this process's CPU utilization in percent
@@ -81,7 +81,10 @@ void Process::Ram(vector<string> statuses) {
   for ( auto status : statuses ) {
     std::istringstream linestream(status);
     while (linestream >> key >> ram) {
-      if (key == "VmSize")
+      // Using VmRSS instead of VmSize because I want physical memory usage
+      // VmSize can give more than physical RAM size which is misleading
+      // See https://man7.org/linux/man-pages/man5/proc.5.html
+      if (key == "VmRSS")
         ram_ = ram / kb_per_mb;
     }
   }
@@ -100,13 +103,14 @@ void Process::Command(string commands) {
 // Set Uptime
 void Process::UpTime(vector<string> stats) {
   int uptime_index = 13;  // Uptime index
-  long uptime = 0;
+  long process_uptime = 0;
 
   if (stats.size() >= 14) {
-    uptime = std::stoul(stats[uptime_index]);
+    process_uptime = std::stoul(stats[uptime_index]);
   }
 
-  uptime_ = uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
+  // TODO try to understand the reviewer's comment, so far it's not making sense
+  uptime_ = process_uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
 }
 
 // Overload the "less than" comparison operator for Process objects

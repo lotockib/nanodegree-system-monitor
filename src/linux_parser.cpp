@@ -136,6 +136,17 @@ long LinuxParser::IdleJiffies(vector<string> stats) {
     std::stoul(stats[CPUStates::kIOwait_]);
   }
 
+// Read uptime
+long LinuxParser::ReadUptime() {
+  string line = "";
+  long uptime = 0;
+  std::ifstream filestream(kProcDirectory + kUptimeFilename);
+  std::getline(filestream, line);
+  std::istringstream linestream(line);
+  linestream >> uptime;  // System uptime in seconds
+  return uptime;
+}
+
 
 // Read stat file and return string
 vector<string> LinuxParser::ReadStat() {
@@ -228,7 +239,7 @@ vector<string> LinuxParser::ReadStatus(int pid) {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       while (linestream >> key) {
-        if ( key == "VmSize" || key == "Uid" )  // We only need to process these lines
+        if ( key == "VmRSS" || key == "Uid" )  // We only need to process these lines
           statuses.push_back(line);
       }
     }

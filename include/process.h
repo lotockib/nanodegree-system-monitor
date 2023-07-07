@@ -8,6 +8,15 @@
 using std::string;
 using std::vector;
 
+// Stats for the process
+struct PidStat {
+  unsigned long long int utime;
+  unsigned long long int stime;
+  unsigned long long int cutime;
+  unsigned long long int cstime;
+  unsigned long long int starttime;
+};
+
 /*
 Contains data for each process.
 */
@@ -15,12 +24,13 @@ class Process {
  public:
   Process(int pid) : pid_(pid) {
     // Read each file only one time
+    long system_uptime = LinuxParser::ReadUptime();
     vector<string> stats = LinuxParser::ReadStat(pid_);
     vector<string> statuses = LinuxParser::ReadStatus(pid_);
     string commands = LinuxParser::ReadCommand(pid_);
 
     // Set local member data using file strings
-    CpuUtilization(stats);
+    CpuUtilization(stats, system_uptime);
     UpTime(stats);
     Ram(statuses);
     User(statuses);
@@ -39,7 +49,7 @@ class Process {
 
  private:
   // Setters
-  void CpuUtilization(vector<string> stats);
+  void CpuUtilization(vector<string> stats, long system_uptime);
   void UpTime(vector<string> stats);
   void Ram(vector<string> statuses);
   void User(vector<string> statuses);
@@ -53,14 +63,6 @@ class Process {
   string uid_{};
   string username_{};
   string command_{};
-};
-
-struct PidStat {
-  unsigned long long int utime;
-  unsigned long long int stime;
-  unsigned long long int cutime;
-  unsigned long long int cstime;
-  unsigned long long int starttime;
 };
 
 #endif  // PROCESS_H_
