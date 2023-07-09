@@ -30,14 +30,7 @@ string Format::ElapsedTime(long seconds) {
 // Format to string with 3 character width
 string Format::MinimumWidth(int value) {
   string result = "";
-
-  if (value < 10) {
-    return " " + std::to_string(value);
-  }
-
-  if (value < 100) {
-    return "  " + std::to_string(value);
-  }
-
-  return std::to_string(value);
+  result = std::to_string(value);
+  result.insert(0, 2 - result.length(), '0');
+  return result;
 }
