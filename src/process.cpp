@@ -98,16 +98,16 @@ void Process::Command(string commands) {
 }
 
 // Set Uptime
-void Process::UpTime(vector<string> stats) {
-  int uptime_index = 13;  // Uptime index
-  long process_uptime = 0;
+void Process::UpTime(vector<string> stats, long system_uptime) {
+  int uptime_index = 21;  // Uptime index
+  long process_starttime = 0;
 
-  if (stats.size() >= 14) {
-    process_uptime = std::stoul(stats[uptime_index]);
+  if (stats.size() >= 22) {
+    process_starttime = std::stoul(stats[uptime_index]);
   }
 
-  // TODO try to understand the reviewer's comment, so far it's not making sense
-  uptime_ = process_uptime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
+  // To determine time since the process started, subtract its starttime from system uptime
+  uptime_ = system_uptime - process_starttime / sysconf(_SC_CLK_TCK);  // Convert ticks to seconds
 }
 
 // Overload the "less than" comparison operator for Process objects

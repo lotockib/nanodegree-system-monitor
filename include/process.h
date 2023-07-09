@@ -31,7 +31,7 @@ class Process {
 
     // Set local member data using file strings
     CpuUtilization(stats, system_uptime);
-    UpTime(stats);
+    UpTime(stats, system_uptime);
     Ram(statuses);
     User(statuses);
     Command(commands);
@@ -50,7 +50,7 @@ class Process {
  private:
   // Setters
   void CpuUtilization(vector<string> stats, long system_uptime);
-  void UpTime(vector<string> stats);
+  void UpTime(vector<string> stats, long system_uptime);
   void Ram(vector<string> statuses);
   void User(vector<string> statuses);
   void Command(string commands);
