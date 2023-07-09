@@ -29,9 +29,9 @@ const string kFilterMemTotal("MemTotal");
 const string kFilterMemFree("MemFree");
 const string kFilterCpu("cpu");
 const string kFilterUID("Uid");
-      // Using VmRSS instead of VmSize because I want physical memory usage
-      // VmSize can give more than physical RAM size which is misleading
-      // See https://man7.org/linux/man-pages/man5/proc.5.html
+// Using VmRSS instead of VmSize because I want physical memory usage
+// VmSize can give more than physical RAM size which can be misleading
+// See https://man7.org/linux/man-pages/man5/proc.5.html
 const string kFilterProcMem("VmRSS");
 const string kFilterkB("kB");
 const string kFilterPrettyName("PRETTY_NAME");
