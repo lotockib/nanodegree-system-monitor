@@ -9,10 +9,7 @@
 #include "../include/system.h"
 #include "../include/linux_parser.h"
 
-using std::set;
-using std::size_t;
-using std::string;
-using std::vector;
+using namespace std;
 
 // Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
@@ -22,10 +19,7 @@ vector<Process>& System::Processes() {
   processes_.clear();
   auto pids = LinuxParser::Pids();
   for (auto pid : pids) {
-    Process new_process(pid);
-    processes_.push_back(new_process);
-      // if ( processes_.size() >= 300 )
-      //   break;
+    processes_.push_back(pid);
     }
 
   sort(
